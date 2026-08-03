@@ -30,11 +30,38 @@ def build_llm(settings: Settings):
 
 def build_embeddings(settings: Settings):
     """
-    Return HuggingFace BGE embeddings (article default: BAAI/bge-small-en-v1.5)
-    """
-    try:  # preferred standalone package
-        from langchain_huggingface import HuggingFaceEmbeddings
-    except ImportError:  # fallback to the community implementation
-        from langchain_community.embeddings import HuggingFaceEmbeddings
+    Return an embeddings object based on EMBEDDING_PROVIDER.
 
-    return HuggingFaceEmbeddings(model_name=settings.embedding_model)
+    * fastembed (default): BGE via ONNX Runtime -- torch-free, local, free. Keeps
+      the article's BAAI/bge-small-en-v1.5 model without pulling PyTorch, so it
+      installs cleanly where torch is unavailable/old (e.g. Intel macOS).
+    * openai: OpenAIEmbeddings (needs OPENAI_API_KEY) -- no local model.
+    * huggingface: the article's exact HuggingFaceEmbeddings path via
+      sentence-transformers (requires the optional [hf] extra + a working torch).
+    """
+    provider = settings.embedding_provider.lower()
+
+    if provider in ("fastembed", "onnx", "default"):
+        from langchain_community.embeddings import FastEmbedEmbeddings
+
+        return FastEmbedEmbeddings(model_name=settings.embedding_model)
+
+    if provider == "openai":
+        from langchain_openai import OpenAIEmbeddings
+
+        if not settings.openai_api_key:
+            raise RuntimeError("EMBEDDING_PROVIDER=openai but OPENAI_API_KEY is not set.")
+        model = settings.embedding_model
+        if not model.startswith("text-embedding"):
+            model = "text-embedding-3-small"  # BGE ids aren't OpenAI models
+        return OpenAIEmbeddings(model=model)
+
+    if provider in ("huggingface", "hf", "sentence-transformers"):
+        try:  # preferred standalone package
+            from langchain_huggingface import HuggingFaceEmbeddings
+        except ImportError:  # fallback to the community implementation
+            from langchain_community.embeddings import HuggingFaceEmbeddings
+
+        return HuggingFaceEmbeddings(model_name=settings.embedding_model)
+
+    raise ValueError(f"Unknown EMBEDDING_PROVIDER: {settings.embedding_provider!r}")

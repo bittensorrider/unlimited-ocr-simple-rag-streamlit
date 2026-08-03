@@ -39,11 +39,25 @@ cp .env.example .env        # then add your OPENAI_API_KEY
 Optional extras:
 
 ```bash
-pip install -e ".[gpu]"     # real Unlimited-OCR — needs an NVIDIA GPU + CUDA
-pip install -e ".[fallback]"# RapidOCR CPU engine (included in requirements.txt)
-pip install -e ".[ui]"      # Streamlit chat UI
-pip install -e ".[dev]"     # pytest + ruff
+pip install -e ".[fallback]" # RapidOCR CPU OCR engine (also in requirements.txt)
+pip install -e ".[ui]"       # Streamlit chat UI
+pip install -e ".[dev]"      # pytest + ruff
+pip install -e ".[gpu]"      # real Unlimited-OCR — needs an NVIDIA GPU + CUDA
+pip install -e ".[hf]"       # article-faithful HuggingFace/BGE embeddings (pulls PyTorch)
 ```
+
+The core install is **torch-free by design**: embeddings default to `fastembed`
+(BGE via ONNX Runtime), so nothing pulls PyTorch. This keeps installs clean on
+machines without a modern torch — notably **Intel macOS**, whose torch ceiling is
+`2.2.2`, which is incompatible with current `transformers`/`numpy 2`. Only the
+`gpu` (real model) and `hf` (sentence-transformers) extras bring in PyTorch.
+
+> **Hit a torch / NumPy 2 / "transformers requires torch>=2.4" error?** You have an
+> older env that pulled `sentence-transformers` + `torch`. Clean it out:
+> ```bash
+> pip uninstall -y sentence-transformers transformers torch torchvision
+> pip install -e ".[fallback,ui,dev]"   # torch-free
+> ```
 
 ## OCR backends
 
@@ -85,7 +99,9 @@ Upload images/PDFs in the sidebar, click **Index documents**, then chat.
 
 ## Configuration
 
-All settings come from environment variables / `.env` (see `.env.example`): `OPENAI_API_KEY`, `LLM_PROVIDER` (`openai` default, `ollama` supported), `LLM_MODEL`, `EMBEDDING_MODEL`, `OCR_BACKEND`, `OCR_MODEL`, `OCR_DPI`, `CHUNK_SIZE`, `CHUNK_OVERLAP`, `RETRIEVAL_K`.
+All settings come from environment variables / `.env` (see `.env.example`): `OPENAI_API_KEY`, `LLM_PROVIDER` (`openai` default, `ollama` supported), `LLM_MODEL`, `EMBEDDING_PROVIDER` (`fastembed` default, `openai`, `huggingface`), `EMBEDDING_MODEL`, `OCR_BACKEND`, `OCR_MODEL`, `OCR_DPI`, `CHUNK_SIZE`, `CHUNK_OVERLAP`, `RETRIEVAL_K`.
+
+**Embedding providers:** `fastembed` (default) runs BGE via ONNX — local, free, torch-free. `openai` uses `text-embedding-3-small` (set `EMBEDDING_MODEL` accordingly; reuses `OPENAI_API_KEY`). `huggingface` is the article's exact sentence-transformers path — install `.[hf]` and use a machine with a working PyTorch.
 
 ## Tests
 

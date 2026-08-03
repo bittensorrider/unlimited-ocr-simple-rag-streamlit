@@ -12,15 +12,18 @@ license = { text = "MIT" }
 authors = [{ name = "William" }]
 keywords = ["ocr", "rag", "langchain", "unlimited-ocr", "baidu", "faiss"]
 
-# Core deps needed for the RAG pipeline + CPU fallback path.
-# GPU / real Unlimited-OCR extras live in [project.optional-dependencies].
+# Core deps for the RAG pipeline + CPU fallback path. Intentionally TORCH-FREE:
+# embeddings default to fastembed (ONNX BGE) so the project installs cleanly on
+# machines without a modern PyTorch (e.g. Intel macOS, whose torch ceiling is 2.2.2).
+# Torch-based options (real Unlimited-OCR, HuggingFace embeddings) live in extras.
 dependencies = [
     "langchain>=0.2",
+    "langchain-classic>=1.0 ; python_version >= '3.10'",
     "langchain-community>=0.2",
     "langchain-openai>=0.1",
     "langchain-text-splitters>=0.2",
     "faiss-cpu>=1.7",
-    "sentence-transformers>=2.6",
+    "fastembed>=0.3",
     "pymupdf>=1.24",
     "pillow>=10.0",
     "python-dotenv>=1.0",
@@ -37,6 +40,12 @@ gpu = [
     "addict>=2.4",
     "easydict>=1.13",
     "psutil>=6.0",
+]
+# Article-faithful HuggingFace/BGE embeddings via sentence-transformers.
+# Pulls PyTorch; not for Intel macOS. Use EMBEDDING_PROVIDER=huggingface with this.
+hf = [
+    "sentence-transformers>=2.6",
+    "langchain-huggingface>=0.1",
 ]
 # CPU fallback OCR engine (no system binary, pip-only).
 fallback = [

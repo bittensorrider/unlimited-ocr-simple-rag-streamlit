@@ -39,6 +39,10 @@ class Settings:
     openai_api_key: str | None = field(default_factory=lambda: os.getenv("OPENAI_API_KEY"))
 
     # Embeddings
+    # Provider: "fastembed" (ONNX BGE, torch-free, default) | "openai" | "huggingface"
+    embedding_provider: str = field(
+        default_factory=lambda: _get("EMBEDDING_PROVIDER", "fastembed").lower()
+    )
     embedding_model: str = field(
         default_factory=lambda: _get("EMBEDDING_MODEL", "BAAI/bge-small-en-v1.5")
     )

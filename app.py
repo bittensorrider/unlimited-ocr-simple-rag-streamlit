@@ -43,7 +43,7 @@ def main() -> None:
         backend = build_ocr_backend(settings)
         st.write(f"**OCR backend:** `{backend.name}`")
         st.write(f"**LLM:** `{settings.llm_provider}` / `{settings.llm_model}`")
-        st.write(f"**Embeddings:** `{settings.embedding_model}`")
+        st.write(f"**Embeddings:** `{settings.embedding_provider}` / `{settings.embedding_model}`")
         if settings.llm_provider == "openai" and not settings.openai_api_key:
             st.warning("OPENAI_API_KEY is not set — answering will fail. Add it to your .env.")
 

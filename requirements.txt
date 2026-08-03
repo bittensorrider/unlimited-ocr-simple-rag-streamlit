@@ -1,5 +1,7 @@
-# Core RAG pipeline + CPU fallback OCR.
-# For the real Baidu Unlimited-OCR model, also install requirements-gpu.txt on a CUDA machine.
+# Core RAG pipeline + CPU fallback OCR. TORCH-FREE by design so it installs on any
+# machine (incl. Intel macOS). For article-faithful HuggingFace/BGE embeddings, see
+# EMBEDDING_PROVIDER=huggingface + `pip install -e ".[hf]"`. For the real Baidu
+# Unlimited-OCR model, also install requirements-gpu.txt on a CUDA machine.
 langchain>=0.2
 # Provides RetrievalQA on langchain>=1.0 (harmless on older versions).
 langchain-classic>=1.0; python_version >= "3.10"
@@ -7,7 +9,8 @@ langchain-community>=0.2
 langchain-openai>=0.1
 langchain-text-splitters>=0.2
 faiss-cpu>=1.7
-sentence-transformers>=2.6
+# Default embeddings: BGE via ONNX Runtime (no PyTorch).
+fastembed>=0.3
 pymupdf>=1.24
 pillow>=10.0
 python-dotenv>=1.0
