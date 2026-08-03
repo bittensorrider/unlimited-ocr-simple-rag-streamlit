@@ -2,7 +2,7 @@
 
 > Implementation of Unlimited OCR + simple RAG + Streamlit app based on the [Medium Post](https://medium.com/data-science-collective/unlimited-ocr-rag-revolutionize-complex-data-extraction-open-source-f4199677ee55)
 
-![Unlimited OCR](screenshot.png)
+![Unlimited OCR](banner.png)
 
 A faithful, runnable implementation of the article **"Unlimited OCR + RAG: Revolutionize Complex Data Extraction (Open-Source)"** by Gao Dalie. It pairs Baidu's [Unlimited-OCR](https://huggingface.co/baidu/Unlimited-OCR) model — a 3B-parameter (≈500M active) vision-language OCR that parses an entire multi-page document in a _single_ forward pass — with a LangChain RAG stack (FAISS + BGE embeddings + GPT-4o).
 
@@ -54,6 +54,7 @@ machines without a modern torch — notably **Intel macOS**, whose torch ceiling
 
 > **Hit a torch / NumPy 2 / "transformers requires torch>=2.4" error?** You have an
 > older env that pulled `sentence-transformers` + `torch`. Clean it out:
+>
 > ```bash
 > pip uninstall -y sentence-transformers transformers torch torchvision
 > pip install -e ".[fallback,ui,dev]"   # torch-free
@@ -94,6 +95,10 @@ uocr-rag chat --load-index ./faiss_index
 ```bash
 streamlit run app.py
 ```
+
+Visit http://localhost:8501/
+
+![Streamlit Chat](screenshot.png)
 
 Upload images/PDFs in the sidebar, click **Index documents**, then chat.
 
