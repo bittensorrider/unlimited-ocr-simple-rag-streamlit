@@ -1,0 +1,13 @@
+# Real Baidu Unlimited-OCR backend. Requires an NVIDIA GPU + CUDA.
+# The model card was tested on Python 3.12 + CUDA 12.9 with the pinned versions below;
+# looser bounds are used here so it resolves on most recent CUDA setups.
+#
+# Install AFTER requirements.txt, on a CUDA machine:
+#   pip install -r requirements.txt -r requirements-gpu.txt
+torch>=2.4
+torchvision>=0.19
+transformers>=4.46
+einops>=0.8
+addict>=2.4
+easydict>=1.13
+psutil>=6.0
